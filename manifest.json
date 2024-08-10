@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "Tubby",
+  "version": "1.0",
+  "description": "Tracks active time per tab and provides a shortcut to close inactive tabs.",
+  "permissions": ["tabs"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "commands": {
+    "close-inactive-tabs": {
+      "suggested_key": {
+        "default": "Shift+Alt+X"
+      },
+      "description": "Close tabs with less than 30 seconds of active time"
+    }
+  }
+}
