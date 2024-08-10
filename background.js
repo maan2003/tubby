@@ -11,6 +11,7 @@ function onTabUnfocus(tabId) {
     const currentTime = getCurrentTime();
     const elapsedTime = currentTime - tabInfo[tabId].lastActivated;
     tabInfo[tabId].activeTime += elapsedTime;
+    tabInfo[tabId].lastUsed = currentTime;
     tabInfo[tabId].lastActivated = null;
   }
 }
@@ -27,9 +28,10 @@ browser.tabs.onActivated.addListener((activeInfo) => {
 
   // Initialize or update current tab's info
   if (!tabInfo[tabId]) {
-    tabInfo[tabId] = { activeTime: 0, lastActivated: currentTime };
+    tabInfo[tabId] = { activeTime: 0, lastActivated: currentTime, lastUsed: currentTime };
   } else {
     tabInfo[tabId].lastActivated = currentTime;
+    tabInfo[tabId].lastUsed = currentTime;
   }
 });
 
@@ -53,7 +55,13 @@ async function closeInactiveTabs() {
 
   for (const tab of tabs) {
     if (tabInfo[tab.id]) {
-      if (tabInfo[tab.id].activeTime < 30) {
+      const timeSinceLastUse = currentTime - tabInfo[tab.id].lastUsed;
+      let scaledThreshold = 30;
+      if (timeSinceLastUse > 60 * 5) {
+        scaledThreshold = 60;
+      }
+
+      if (tabInfo[tab.id].activeTime < scaledThreshold) {
         browser.tabs.remove(tab.id);
       }
     }
